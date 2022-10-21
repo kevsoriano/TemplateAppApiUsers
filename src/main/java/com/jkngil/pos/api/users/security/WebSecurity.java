@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,8 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.jkngil.pos.api.users.service.UsersService;
 
-@Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled=true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -27,11 +28,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
 		http.authorizeRequests()
-		.antMatchers("/**").hasIpAddress(env.getProperty("gateway.ip"))
+		.antMatchers(HttpMethod.POST, "/users").hasIpAddress(env.getProperty("gateway.ip"))
+		.antMatchers("/h2-console/**").permitAll()
 		.antMatchers(HttpMethod.GET, "/actuator/health").hasIpAddress(env.getProperty("gateway.ip"))
 		.antMatchers(HttpMethod.GET, "/actuator/circuitbreakerevents").hasIpAddress(env.getProperty("gateway.ip"))
+		.anyRequest().authenticated()
 		.and()
-		.addFilter(getAuthenticationFilter());
+		.addFilter(getAuthenticationFilter())
+		.addFilter(new AuthorizationFilter(authenticationManager(), env));
 		http.headers().frameOptions().disable();
 	}
 	

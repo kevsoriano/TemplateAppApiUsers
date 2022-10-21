@@ -1,13 +1,18 @@
 package com.jkngil.pos.api.users.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
+import javax.persistence.JoinColumn;
 @Entity
 @Table(name="users")
 public class UserEntity implements Serializable {
@@ -26,6 +31,12 @@ public class UserEntity implements Serializable {
 	private String encryptedPassword;
 	@Column(nullable=false, unique=true)
 	private String userId;
+	@ManyToMany(cascade= { CascadeType.PERSIST }, fetch = FetchType.EAGER )
+	@JoinTable(name="user_roles", 
+			joinColumns=@JoinColumn(name="users_id",referencedColumnName="id"), 
+			inverseJoinColumns=@JoinColumn(name="roles_id",referencedColumnName="id"))
+	private Collection<RoleEntity> roles;
+	
 	
 	public String getFirstName() {
 		return firstName;
@@ -72,6 +83,18 @@ public class UserEntity implements Serializable {
 	}
 
 	public void setDatabaseId(long id) {
+		this.id = id;
+	}
+
+	public Collection<RoleEntity> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Collection<RoleEntity> roles) {
+		this.roles = roles;
+	}
+
+	public void setId(long id) {
 		this.id = id;
 	}
 
