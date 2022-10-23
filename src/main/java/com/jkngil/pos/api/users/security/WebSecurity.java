@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.jkngil.pos.api.users.data.UsersRepository;
 import com.jkngil.pos.api.users.service.UsersService;
 
 @EnableWebSecurity
@@ -23,6 +24,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
 	private Environment env;
+	@Autowired
+	private UsersRepository userRepository;
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -32,10 +35,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers("/h2-console/**").permitAll()
 		.antMatchers(HttpMethod.GET, "/actuator/health").hasIpAddress(env.getProperty("gateway.ip"))
 		.antMatchers(HttpMethod.GET, "/actuator/circuitbreakerevents").hasIpAddress(env.getProperty("gateway.ip"))
+//		.antMatchers(HttpMethod.DELETE, "users/**").hasIpAddress(env.getProperty("gateway.ip"))
 		.anyRequest().authenticated()
 		.and()
 		.addFilter(getAuthenticationFilter())
-		.addFilter(new AuthorizationFilter(authenticationManager(), env));
+		.addFilter(new AuthorizationFilter(authenticationManager(), userRepository, env));
 		http.headers().frameOptions().disable();
 	}
 	

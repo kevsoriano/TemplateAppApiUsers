@@ -24,7 +24,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     UsersRepository userRepository;
     Environment env;
     
-    public AuthorizationFilter(AuthenticationManager authManager, Environment env) {
+    public AuthorizationFilter(AuthenticationManager authManager, UsersRepository userRepository, Environment env) {
         super(authManager);
         this.userRepository = userRepository;
         this.env = env;
@@ -61,8 +61,9 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                     .getSubject();
             
             if (user != null) {
-//                UserEntity userEntity = userRepository.findByEmail(user);
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                UserEntity userEntity = userRepository.findByUserId(user);
+            	UserPrincipal userPrincipal = new UserPrincipal(userEntity);
+                return new UsernamePasswordAuthenticationToken(user, null, userPrincipal.getAuthorities());
             }
             
             return null;

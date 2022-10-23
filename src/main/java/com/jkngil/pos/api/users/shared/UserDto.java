@@ -1,8 +1,10 @@
 package com.jkngil.pos.api.users.shared;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
+import com.jkngil.pos.api.users.data.RoleEntity;
 import com.jkngil.pos.api.users.ui.model.AlbumResponseModel;
 
 public class UserDto implements Serializable {
@@ -17,6 +19,7 @@ public class UserDto implements Serializable {
 	private String encryptedPassword;
 	private String userId;
 	private List<AlbumResponseModel> albums;
+	private Collection<RoleEntity> roles;
 
 	public String getFirstName() {
 		return firstName;
@@ -72,6 +75,14 @@ public class UserDto implements Serializable {
 
 	public void setAlbums(List<AlbumResponseModel> albums) {
 		this.albums = albums;
+	}
+
+	public Collection<RoleEntity> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Collection<RoleEntity> roles) {
+		this.roles = roles;
 	}
 
 }

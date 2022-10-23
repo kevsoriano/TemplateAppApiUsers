@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
@@ -23,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import com.jkngil.pos.api.users.data.AlbumsServiceClient;
 import com.jkngil.pos.api.users.data.UserEntity;
 import com.jkngil.pos.api.users.data.UsersRepository;
+import com.jkngil.pos.api.users.security.UserPrincipal;
 import com.jkngil.pos.api.users.shared.UserDto;
 import com.jkngil.pos.api.users.ui.model.AlbumResponseModel;
 
@@ -71,7 +75,8 @@ public class UsersServiceImpl implements UsersService {
 		UserEntity userEntity = usersRepository.findByEmail(username);
 		if(userEntity==null) throw new UsernameNotFoundException(username);
 		
-		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true, true,true, true, new ArrayList<>());
+//		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true, true,true, true, new ArrayList<>());
+		return new UserPrincipal(userEntity);
 	}
 
 	@Override
@@ -105,6 +110,47 @@ public class UsersServiceImpl implements UsersService {
 		userDto.setAlbums(albumsList);
 		
 		return userDto;
+	}
+
+	@Override
+	public UserDto updateUser(String id, UserDto user) {
+		UserEntity userEntity = usersRepository.findByUserId(id);
+		if(userEntity == null) throw new UsernameNotFoundException("User not found.");
+		
+		userEntity.setFirstName(user.getFirstName());
+		userEntity.setLastName(user.getLastName());
+		userEntity.setRoles(user.getRoles());
+		
+		UserEntity updatedUserDetails = usersRepository.save(userEntity);
+		
+		return new ModelMapper().map(updatedUserDetails, UserDto.class);
+	}
+
+	@Override
+	public void deleteUser(String id) {
+		UserEntity userEntity = usersRepository.findByUserId(id);
+		if(userEntity == null) throw new UsernameNotFoundException("User not found.");
+		
+		usersRepository.delete(userEntity);
+	}
+
+	@Override
+	public List<UserDto> getUsers(int page, int limit) {
+		List<UserDto> returnValue = new ArrayList<>();
+		
+		Pageable pageableRequest = PageRequest.of(page, limit);
+		Page<UserEntity> usersPage = usersRepository.findAll(pageableRequest);
+		List<UserEntity> users = usersPage.getContent();
+		
+		for(UserEntity userEntity: users) {
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+			
+			UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+			returnValue.add(userDto);
+		}
+		
+		return returnValue;
 	}
 	
 //  Rest Template

@@ -49,7 +49,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
 	@Override
 	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException, ServletException {
-		String username = ((User) auth.getPrincipal()).getUsername();
+		String username = ((UserPrincipal) auth.getPrincipal()).getUsername();
 		UserDto userDetails = usersService.getUserDetailsByEmail(username);
 		
 		String token = Jwts.builder()
