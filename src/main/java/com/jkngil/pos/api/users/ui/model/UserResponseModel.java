@@ -1,9 +1,6 @@
 package com.jkngil.pos.api.users.ui.model;
 
-import java.util.Collection;
 import java.util.List;
-
-import com.jkngil.pos.api.users.data.RoleEntity;
 
 public class UserResponseModel {
 	private String userId;
@@ -42,6 +39,5 @@ public class UserResponseModel {
 	public void setAlbums(List<AlbumResponseModel> albums) {
 		this.albums = albums;
 	}
-	
 	
 }

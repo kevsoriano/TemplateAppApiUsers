@@ -1,6 +1,8 @@
 package com.jkngil.pos.api.users.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.jkngil.pos.api.users.data.AlbumsServiceClient;
+import com.jkngil.pos.api.users.data.RoleEntity;
+import com.jkngil.pos.api.users.data.RoleRepository;
 import com.jkngil.pos.api.users.data.UserEntity;
 import com.jkngil.pos.api.users.data.UsersRepository;
 import com.jkngil.pos.api.users.security.UserPrincipal;
@@ -37,6 +41,9 @@ public class UsersServiceImpl implements UsersService {
 	
 	@Autowired
 	UsersRepository usersRepository;
+	
+	@Autowired
+	RoleRepository roleRepository;
 	
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -63,6 +70,15 @@ public class UsersServiceImpl implements UsersService {
 		
 		UserEntity userEntity = modelMapper.map(userDetails, UserEntity.class);
 		
+		Collection<RoleEntity> roleEntities = new HashSet<>();
+		for(String role: userDetails.getRoles()) {
+			RoleEntity roleEntity = roleRepository.findByName(role);
+			if(roleEntity != null) {
+				roleEntities.add(roleEntity);
+			}
+		}
+		
+		userEntity.setRoles(roleEntities);
 		usersRepository.save(userEntity);
 		
 		UserDto returnValue = modelMapper.map(userEntity, UserDto.class);
@@ -103,7 +119,7 @@ public class UsersServiceImpl implements UsersService {
 		
 		logger.info("Before calling albums microservice");
 		
-		List<AlbumResponseModel> albumsList = albumsList = albumsServiceClient.getAlbums(userId);
+		List<AlbumResponseModel> albumsList = albumsServiceClient.getAlbums(userId);
 		
 		logger.info("After calling albums microservice");
 		
@@ -119,7 +135,15 @@ public class UsersServiceImpl implements UsersService {
 		
 		userEntity.setFirstName(user.getFirstName());
 		userEntity.setLastName(user.getLastName());
-		userEntity.setRoles(user.getRoles());
+		
+		Collection<RoleEntity> roleEntities = new HashSet<>();
+		for(String role: user.getRoles()) {
+			RoleEntity roleEntity = roleRepository.findByName(role);
+			if(roleEntity != null) {
+				roleEntities.add(roleEntity);
+			}
+		}
+		userEntity.setRoles(roleEntities);
 		
 		UserEntity updatedUserDetails = usersRepository.save(userEntity);
 		

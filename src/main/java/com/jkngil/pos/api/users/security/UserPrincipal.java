@@ -2,6 +2,7 @@ package com.jkngil.pos.api.users.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -25,8 +26,8 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		List<AuthorityEntity> authorityEntities = new ArrayList<>();
+		Collection<GrantedAuthority> authorities = new HashSet<>();
+		Collection<AuthorityEntity> authorityEntities = new HashSet<>();
 		// Get user roles
 		Collection<RoleEntity> roles = this.userEntity.getRoles();
 		

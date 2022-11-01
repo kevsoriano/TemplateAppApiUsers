@@ -19,7 +19,7 @@ public class UserDto implements Serializable {
 	private String encryptedPassword;
 	private String userId;
 	private List<AlbumResponseModel> albums;
-	private Collection<RoleEntity> roles;
+	private Collection<String> roles;
 
 	public String getFirstName() {
 		return firstName;
@@ -68,21 +68,21 @@ public class UserDto implements Serializable {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
+
+	public Collection<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Collection<String> roles) {
+		this.roles = roles;
+	}
+
 	public List<AlbumResponseModel> getAlbums() {
 		return albums;
 	}
 
 	public void setAlbums(List<AlbumResponseModel> albums) {
 		this.albums = albums;
-	}
-
-	public Collection<RoleEntity> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(Collection<RoleEntity> roles) {
-		this.roles = roles;
 	}
 
 }

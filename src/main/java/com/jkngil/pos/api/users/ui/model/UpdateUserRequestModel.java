@@ -6,7 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class CreateUserRequestModel {
+public class UpdateUserRequestModel {
 	@NotEmpty(message="First name can not be null or empty")
 	@Size(min=2,message="First Name should not be less than 2 characters")
 	private String firstName;
@@ -14,11 +14,7 @@ public class CreateUserRequestModel {
 	@Size(min=2,message="First Name should not be less than 2 characters")
 	private String lastName;
 	@NotEmpty(message="First name can not be null or empty")
-	@Email
-	private String email;
-	@NotEmpty(message="Password name can not be null or empty")
-	@Size(min=8, max=16,message="Password should must be equal or greather than 8 characters and less than or equal to 16 characters")
-	private String password;
+	private Collection<String> roles;
 
 	public String getFirstName() {
 		return firstName;
@@ -36,20 +32,11 @@ public class CreateUserRequestModel {
 		this.lastName = lastName;
 	}
 
-	public String getEmail() {
-		return email;
+	public Collection<String> getRoles() {
+		return roles;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setRoles(Collection<String> roles) {
+		this.roles = roles;
 	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 }

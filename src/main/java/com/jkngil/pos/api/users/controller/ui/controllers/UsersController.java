@@ -1,6 +1,8 @@
 package com.jkngil.pos.api.users.controller.ui.controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -12,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +29,7 @@ import com.jkngil.pos.api.users.service.UsersService;
 import com.jkngil.pos.api.users.shared.UserDto;
 import com.jkngil.pos.api.users.ui.model.CreateUserRequestModel;
 import com.jkngil.pos.api.users.ui.model.CreateUserResponseModel;
+import com.jkngil.pos.api.users.ui.model.UpdateUserRequestModel;
 import com.jkngil.pos.api.users.ui.model.UserResponseModel;
 
 @RestController
@@ -48,6 +52,7 @@ public class UsersController {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
+		userDto.setRoles(new HashSet<>(Arrays.asList("ROLE_ADMIN")));
 		UserDto createdUser = usersService.createUser(userDto);
 
 		CreateUserResponseModel returnValue = modelMapper.map(createdUser, CreateUserResponseModel.class);
@@ -81,7 +86,7 @@ public class UsersController {
 	}
 	
 	@PutMapping(value="/{userId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<UserResponseModel> updateUser(@PathVariable String userId, @RequestBody CreateUserRequestModel userDetails) {
+	public ResponseEntity<UserResponseModel> updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserRequestModel userDetails) {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
@@ -93,6 +98,7 @@ public class UsersController {
 	}
 	
 	@DeleteMapping(value="/{userId}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public HttpStatus deleteUser(@PathVariable String userId) {
 		usersService.deleteUser(userId);
 		return HttpStatus.OK;
