@@ -67,7 +67,7 @@ public class UsersController {
 	}
 	
 	@GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<List<UserResponseModel>> getUsers(@RequestParam(value="page", defaultValue="1") int page, @RequestParam(value="limit", defaultValue="25") int limit) {
+	public ResponseEntity<List<UserResponseModel>> getUsers(@RequestParam(value="page", defaultValue="0") int page, @RequestParam(value="limit", defaultValue="25") int limit) {
 		List<UserResponseModel> returnValue = new ArrayList<>();
 		List<UserDto> users = usersService.getUsers(page, limit);
 		for(UserDto userDto: users) {
